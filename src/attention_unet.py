@@ -8,7 +8,7 @@ from pathlib import Path
 from tensorflow.keras.optimizers import Adam
 
 from losses import LossFunctions
-from model_utils import get_unet, IOU_coef
+from model_utils import attn_unet
 from utils import (
         add_path, get_paths_by_chip,get_images, plot_loss, transform_images
     )
@@ -28,6 +28,7 @@ if __name__ == '__main__':
     train_metadata = add_path(train_metadata, DATA_PATH)
 
     # Removing difficult ids from validation
+    # https://github.com/drivendataorg/stac-overflow/blob/main/3rd_Place/01-ewl-stac.ipynb
     difficult_ids = ['hxu','jja','pxs']
     flood_ids = list(
             set(train_metadata.flood_id.unique().tolist())-set(difficult_ids)
@@ -53,10 +54,10 @@ if __name__ == '__main__':
     train_y_final = np.concatenate((train_y, train_y_aug))
 
     input_img = Input((img_size, img_size, 9), name='img')
-    model = get_unet(input_img, n_filters=16, dropout=0.05, batchnorm=True)
-    model.compile(optimizer=Adam(),
-        loss=LossFunctions.DiceLoss_square,
-        metrics=[IOU_coef]
+    model = attn_unet(
+            Adam(learning_rate=1e-4),
+            img_size,
+            LossFunctions.DiceLoss_square
     )
 
     callbacks = [
