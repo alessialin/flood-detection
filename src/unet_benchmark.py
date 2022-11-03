@@ -16,7 +16,8 @@ from utils import (
 
 if __name__ == '__main__':
     DATA_PATH = Path.cwd() / "training_data"
-    MODEL_NAME = "unet_model.h5" 
+    MODEL_NAME = "unet_model_diceloss" 
+    MODEL_NAME_SQ = "unet_model_diceloss_square" 
     train_metadata = pd.read_csv(
         DATA_PATH / "flood-training-metadata.csv",
         parse_dates=["scene_start"]
@@ -50,16 +51,31 @@ if __name__ == '__main__':
     train_y_final = np.concatenate((train_y, train_y_aug))
 
     input_img = Input((img_size, img_size, 9), name='img')
-    model = get_unet(input_img, n_filters=16, dropout=0.05, batchnorm=True)
-    model.compile(optimizer=Adam(), loss=LossFunctions.DiceLoss_square, metrics=[IOU_coef])
+    model_diceloss = get_unet(input_img, n_filters=16, dropout=0.05, batchnorm=True)
+    model_diceloss.compile(
+            optimizer=Adam(),
+            loss=LossFunctions.DiceLoss,
+            metrics=[IOU_coef]
+        )
+    model_diceloss_sq = get_unet(input_img, n_filters=16, dropout=0.05, batchnorm=True)
+    model_diceloss_sq.compile(
+            optimizer=Adam(),
+            loss=LossFunctions.DiceLoss_square,
+            metrics=[IOU_coef]
+        )
 
     callbacks = [
         EarlyStopping(patience=10, verbose=1),
-        ReduceLROnPlateau(factor=0.1, patience=3, min_lr=0.00001, verbose=1),
-        ModelCheckpoint('/models/' + MODEL_NAME, verbose=1, save_best_only=True, save_weights_only=False)
+        ReduceLROnPlateau(factor=0.1, patience=3, min_lr=0.00001, verbose=1)
     ]
 
-    results = model.fit(train_x_final, train_y_final, batch_size=8, epochs=100, callbacks=callbacks,
-                        validation_data=(test_x, test_y))
+    results = model_diceloss.fit(
+            train_x_final,
+            train_y_final,
+            batch_size=8,
+            epochs=100,
+            callbacks=callbacks,
+            validation_data=(test_x, test_y))
 
-    plot_loss(results, 'Unet')
+    plot_loss(results, MODEL_NAME)
+    plot_loss(results, MODEL_NAME_SQ)
