@@ -16,7 +16,7 @@ from utils import (
 
 if __name__ == '__main__':
     DATA_PATH = Path.cwd() / "training_data"
-    MODEL_NAME = "unet_model.h5" 
+    MODEL_NAME = "unet_tversky_model.h5" 
     train_metadata = pd.read_csv(
         DATA_PATH / "flood-training-metadata.csv",
         parse_dates=["scene_start"]
@@ -51,15 +51,30 @@ if __name__ == '__main__':
 
     input_img = Input((img_size, img_size, 9), name='img')
     model = get_unet(input_img, n_filters=16, dropout=0.05, batchnorm=True)
-    model.compile(optimizer=Adam(), loss=LossFunctions.DiceLoss_square, metrics=[IOU_coef])
+    model.compile(
+            optimizer=Adam(),
+            loss=LossFunctions.tversky_loss,
+            metrics=[IOU_coef]
+        )
 
     callbacks = [
         EarlyStopping(patience=10, verbose=1),
         ReduceLROnPlateau(factor=0.1, patience=3, min_lr=0.00001, verbose=1),
-        ModelCheckpoint('/models/' + MODEL_NAME, verbose=1, save_best_only=True, save_weights_only=False)
+        ModelCheckpoint(
+            '/models/' + MODEL_NAME,
+            verbose=1,
+            save_best_only=True,
+            save_weights_only=False
+        )
     ]
 
-    results = model.fit(train_x_final, train_y_final, batch_size=8, epochs=100, callbacks=callbacks,
-                        validation_data=(test_x, test_y))
+    results = model.fit(
+            train_x_final,
+            train_y_final,
+            batch_size=8,
+            epochs=100,
+            callbacks=callbacks,
+            validation_data=(test_x, test_y)
+        )
 
-    plot_loss(results, 'Unet')
+    plot_loss(results, 'Tverky Loss Unet')

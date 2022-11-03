@@ -10,7 +10,7 @@ from tensorflow.keras.optimizers import Adam
 from losses import LossFunctions
 from model_utils import get_unet, IOU_coef
 from utils import (
-        add_path, get_paths_by_chip, get_images, plot_loss, transform_images
+        add_path, get_paths_by_chip,get_images, plot_loss, transform_images
     )
 
 
@@ -62,4 +62,4 @@ if __name__ == '__main__':
     results = model.fit(train_x_final, train_y_final, batch_size=8, epochs=100, callbacks=callbacks,
                         validation_data=(test_x, test_y))
 
-    plot_loss(results, 'Unet')
+    plot_loss(results)
