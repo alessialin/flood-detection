@@ -2,11 +2,10 @@ import keras.backend as K
 import tensorflow as tf
 
 from keras.models import Model
-#from keras.layers.pooling import MaxPooling2D
 from keras.layers import (
         BatchNormalization, Activation, Dropout, concatenate,
-        Activation, add, multiply, Lambda, Input, Conv2D, MaxPooling2D,
-        UpSampling2D, Conv2DTranspose
+        Activation, add, multiply, Lambda, Input, Conv2D,
+        MaxPooling2D, UpSampling2D, Conv2DTranspose
     )
 from keras.layers.convolutional import Conv2D, Conv2DTranspose
 
@@ -22,7 +21,6 @@ def IOU_coef(y_true, y_pred):
 
     #make all values > 0.5 a 1 and all others a 0
     y_pred = tf.cast((y_pred > 0.5), dtype=tf.float32)
-    #y_pred = tf.math.multiply(tf.math.greater(y_pred, 0.5),1.0)
 
     y_true_f = K.flatten(y_true)
     y_pred_f = K.flatten(y_pred)
@@ -121,7 +119,11 @@ def AttnGatingBlock(x, g, inter_shape, name):
     shape_theta_x = K.int_shape(theta_x)
 
     phi_g = Conv2D(inter_shape, (1, 1), padding='same')(g)
-    upsample_g = Conv2DTranspose(inter_shape, (3, 3),strides=(shape_theta_x[1] // shape_g[1], shape_theta_x[2] // shape_g[2]),padding='same', name='g_up'+name)(phi_g)  # 16
+    upsample_g = Conv2DTranspose(
+            inter_shape, (3, 3),
+            strides=(shape_theta_x[1] // shape_g[1],
+            shape_theta_x[2] // shape_g[2]),
+            padding='same', name='g_up'+name)(phi_g)  # 16
 
     concat_xg = add([upsample_g, theta_x])
     act_xg = Activation('relu')(concat_xg)
@@ -195,4 +197,5 @@ def attn_unet(opt, input_size, lossfxn):
     
     model = Model(inputs=[inputs], outputs=[out])
     model.compile(optimizer=opt, loss=lossfxn, metrics=[IOU_coef])
+
     return model

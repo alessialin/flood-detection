@@ -1,6 +1,5 @@
 import keras.backend as K
 import tensorflow as tf
-from keras.losses import binary_crossentropy
 
 
 class LossFunctions:
@@ -10,9 +9,9 @@ class LossFunctions:
     
 
     def DiceLoss_square(self, smooth=1):
-    #create the missing data mask
+        #create the missing data mask
         mask = tf.math.not_equal(self.y_true, 255)
-    #apply the mask
+        #apply the mask
         y_true = tf.boolean_mask(self.y_true, mask)
         y_pred = tf.boolean_mask(self.y_pred, mask)
 
@@ -56,4 +55,3 @@ class LossFunctions:
     def focal_tversky(self, gamma = 0.75):
         pt_1 = LossFunctions.tversky(self.y_true, self.y_pred)
         return K.pow((1-pt_1), gamma)
-
