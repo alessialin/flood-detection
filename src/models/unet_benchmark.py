@@ -2,7 +2,7 @@ import random
 
 import numpy as np
 import pandas as pd
-from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
+from keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from keras.layers import Input
 from pathlib import Path
 from tensorflow.keras.optimizers import Adam
@@ -51,13 +51,23 @@ if __name__ == '__main__':
     train_y_final = np.concatenate((train_y, train_y_aug))
 
     input_img = Input((img_size, img_size, 9), name='img')
-    model_diceloss = get_unet(input_img, n_filters=16, dropout=0.05, batchnorm=True)
+    model_diceloss = get_unet(
+            input_img,
+            n_filters=16,
+            dropout=0.05,
+            batchnorm=True
+        )
     model_diceloss.compile(
             optimizer=Adam(),
             loss=LossFunctions.DiceLoss,
             metrics=[IOU_coef]
         )
-    model_diceloss_sq = get_unet(input_img, n_filters=16, dropout=0.05, batchnorm=True)
+    model_diceloss_sq = get_unet(
+            input_img,
+            n_filters=16,
+            dropout=0.05,
+            batchnorm=True
+        )
     model_diceloss_sq.compile(
             optimizer=Adam(),
             loss=LossFunctions.DiceLoss_square,
