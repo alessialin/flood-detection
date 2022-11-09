@@ -106,22 +106,22 @@ def get_images(feature_path, label_path):
             with rasterio.open(feature_path.loc[row, col]) as img:
           #load the tif file
                 if(col in ["vv_path", "vh_path"]):
-              #apply transformation: clip values out of -30;0 range and map them to 0; 255 range then convert to uint8
+                    #apply transformation: clip values out of -30;0 range and map them to 0; 255 range then convert to uint8
                     images.append(
                             ma.array(np.uint8(
-                                np.clip(img.read(1), -30, 0)*(-8.4)
+                                np.clip(img.read(1), -30, 0)*(-8.5)
                             ), mask = masks[row])
                         )
                 elif col == "nasadem":
-              #clip values > 255 and converto to uint8
+                    #clip values > 255 and converto to uint8
                     images.append(
                             ma.array(np.uint8(
                                 np.clip(img.read(1), 0, 255)
                             ), mask = masks[row])
                         )
                 else:
-              #no transformation, values are already between 0 and 255 and in uint8 format
-                  images.append(ma.array(img.read(1), mask = masks[row]))
+                #no transformation, values are already between 0 and 255 and in uint8 format
+                    images.append(ma.array(img.read(1), mask = masks[row]))
         features.append(np.stack(images, axis=-1))  
 
     return np.array(features), np.array(labels)
@@ -150,10 +150,17 @@ def transform_images(train_images, label_images):
 
 def plot_loss(results, model_name):
     plt.figure(figsize=(8, 8))
-    plt.title(f"{model_name} Learning curve - IoU: {round(max(results.history['IOU_coef']), 4)}")
+    iou = round(max(results.history['IOU_coef']), 4)
+    plt.title(f"{model_name} Learning curve - IoU: {iou}")
     plt.plot(results.history["loss"], label="loss")
     plt.plot(results.history["val_loss"], label="val_loss")
-    plt.plot( np.argmin(results.history["val_loss"]), np.min(results.history["val_loss"]), marker="x", color="r", label="best model")
+    plt.plot( np.argmin(
+            results.history["val_loss"]),
+            np.min(results.history["val_loss"]),
+            marker="x",
+            color="r",
+            label="best model"
+        )
     plt.xlabel("Epochs")
     plt.ylabel("log_loss")
     plt.legend()

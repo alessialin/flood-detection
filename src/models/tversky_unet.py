@@ -7,9 +7,9 @@ from keras.layers import Input
 from pathlib import Path
 from tensorflow.keras.optimizers import Adam
 
-from losses import LossFunctions
-from model_utils import get_unet, IOU_coef
-from utils import (
+from utils.losses import LossFunctions
+from utils.model_utils import get_unet, IOU_coef
+from utils.utils import (
         add_path, get_paths_by_chip, get_images, plot_loss, transform_images
     )
 

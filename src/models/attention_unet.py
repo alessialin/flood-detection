@@ -31,7 +31,7 @@ if __name__ == '__main__':
     # https://github.com/drivendataorg/stac-overflow/blob/main/3rd_Place/01-ewl-stac.ipynb
     difficult_ids = ['hxu', 'jja', 'pxs']
     flood_ids = list(
-            set(train_metadata.flood_id.unique().tolist())-set(difficult_ids)
+            set(train_metadata.flood_id.unique().tolist()) - set(difficult_ids)
         )
     val_flood_ids = random.sample(flood_ids, 3)
     test = train_metadata[train_metadata.flood_id.isin(val_flood_ids)]
