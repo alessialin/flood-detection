@@ -70,7 +70,7 @@ if __name__ == '__main__':
         )
     model_diceloss_sq.compile(
             optimizer=Adam(),
-            loss=LossFunctions.DiceLoss_square,
+            loss=LossFunctions.DiceLoss,
             metrics=[IOU_coef]
         )
 

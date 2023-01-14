@@ -16,7 +16,7 @@ from utils.utils import (
 
 if __name__ == '__main__':
     DATA_PATH = Path.cwd() / "training_data"
-    MODEL_NAME = "unet_tversky_model.h5" 
+    MODEL_NAME = "unet_tversky_model.h5"
     train_metadata = pd.read_csv(
         DATA_PATH / "flood-training-metadata.csv",
         parse_dates=["scene_start"]

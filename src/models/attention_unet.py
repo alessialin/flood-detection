@@ -57,7 +57,7 @@ if __name__ == '__main__':
     model = attn_unet(
             Adam(learning_rate=1e-4),
             img_size,
-            LossFunctions.DiceLoss_square
+            LossFunctions.DiceLoss
     )
 
     callbacks = [
